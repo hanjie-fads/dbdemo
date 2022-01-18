@@ -32,7 +32,7 @@ func DemoQmgo() {
 
     // make indexes
     cli.EnsureIndexes(ctx, []string{}, []string{"uid", "name,email"})
-    
+
     // 4. insert one record
     if iResult, err = cli.InsertOne(ctx, mock.OneStaff); err != nil {
         fmt.Print(err)

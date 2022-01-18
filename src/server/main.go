@@ -21,6 +21,7 @@ func getStaff(c *gin.Context) {
 	}
 }
 func main() {
+	DemoQmgo()
 	router := gin.Default()
 	router.GET("/staff", getStaffAll)
 	router.GET("/staff/:uid", getStaff)

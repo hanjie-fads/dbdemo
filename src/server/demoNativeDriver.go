@@ -27,10 +27,10 @@ func DemoNativeDrive() {
         id         primitive.ObjectID
     )
     // 2. 使用するDBを選択
-    db = client.Database("demo-db")
+    db = client.Database("kintai-db")
 
     // 3. collectionを選択する
-    collection = db.Collection("coll-1")
+    collection = db.Collection("staff")
 
 
     // 4. insert one record

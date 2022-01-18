@@ -18,7 +18,7 @@ func DemoQmgo() {
         // client, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017"})
         // db = client.Database("hjdb")
         // coll = db.Collection("coll-1")
-        cli, err = qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "demo-db", Coll: "coll-1"})
+        cli, err = qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "kintai-db", Coll: "staff"})
         iResult    *qmgo.InsertOneResult
         mResult    *qmgo.InsertManyResult
         //cursor     *qmgo.Cursor
@@ -63,15 +63,4 @@ func DemoQmgo() {
         return
     }
     fmt.Printf("find one: %v", one)
-
-    // delete a document
-    err = cli.Remove(ctx, bson.M{"uid": 15})
-
-    // find all 、sort and limit
-    batch := []model.Staff{}
-    cli.Find(ctx, bson.M{"xxx": 6}).Sort("weight").Limit(7).All(&batch)
-
-    // count
-    count, err := cli.Find(ctx, bson.M{"age": 6}).Count()
-    fmt.Printf("count: %v", count)
 }

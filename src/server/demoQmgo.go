@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"kintai/mock"
+	"kintai/model"
 	"log"
 
 	"github.com/qiniu/qmgo"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,7 +18,7 @@ func DemoQmgo() {
         // client, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017"})
         // db = client.Database("hjdb")
         // coll = db.Collection("coll-1")
-        cli, err = qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "hjdb", Coll: "coll-1"})
+        cli, err = qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "demo-db", Coll: "coll-1"})
         iResult    *qmgo.InsertOneResult
         mResult    *qmgo.InsertManyResult
         //cursor     *qmgo.Cursor
@@ -53,38 +55,23 @@ func DemoQmgo() {
         fmt.Println("auto ID", id.Hex())
     }
 
-    // 6. query, find
-    //joken := model.FindByStaffName{StaffName: "hanjie"}
+	// find one document
+    one := model.Staff{}
+    err = cli.Find(ctx, bson.M{"uid": 15}).One(&one)
+    if err != nil {
+        fmt.Print(err)
+        return
+    }
+    fmt.Printf("find one: %v", one)
 
-    // //按照jobName字段进行过滤jobName="job10",翻页参数0-2
-    // if cursor, err = cli.Find(context.TODO(), joken, options.Find().SetLimit(2)); err != nil {
-    //     fmt.Println(err)
-    //     return
-    // }
-    // // カーソルのDelay閉じる
-    // defer func() {
-    //     if err = cursor.Close(context.TODO()); err != nil {
-    //         log.Fatal(err)
-    //     }
-    // }()
+    // delete a document
+    err = cli.Remove(ctx, bson.M{"uid": 15})
 
-    // // recur cursor
-    // for cursor.Next(context.TODO()) {
-    //     var sr model.Staff
-    //     // parse Bson to object
-    //     if cursor.Decode(&sr) != nil {
-    //         fmt.Print(err)
-    //         return
-    //     }
-    //     fmt.Println(sr)
-    // }
+    // find all 、sort and limit
+    batch := []model.Staff{}
+    cli.Find(ctx, bson.M{"xxx": 6}).Sort("weight").Limit(7).All(&batch)
 
-    // // other recur
-    // var results []model.Staff
-    // if err = cursor.All(context.TODO(), &results); err != nil {
-    //     log.Fatal(err)
-    // }
-    // for _, rst := range results {
-    //     fmt.Println(rst)
-    // }
+    // count
+    count, err := cli.Find(ctx, bson.M{"age": 6}).Count()
+    fmt.Printf("count: %v", count)
 }

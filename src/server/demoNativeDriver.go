@@ -27,7 +27,7 @@ func DemoNativeDrive() {
         id         primitive.ObjectID
     )
     // 2. 使用するDBを選択
-    db = client.Database("hjdb")
+    db = client.Database("demo-db")
 
     // 3. collectionを選択する
     collection = db.Collection("coll-1")

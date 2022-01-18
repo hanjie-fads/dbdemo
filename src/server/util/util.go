@@ -2,32 +2,29 @@ package util
 
 import (
 	"context"
-	"log"
+	"os"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/qiniu/qmgo"
 )
 
-var mgoCli *mongo.Client
+var (
+    err        error
+    mgoClient  *qmgo.Client
+    mgoDB      *qmgo.Database
+    mgoCollStaff  *qmgo.Collection
+)
 
-func initEngine() {
-    var err error
-    clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-
-    // 连接到MongoDB
-    mgoCli, err = mongo.Connect(context.TODO(), clientOptions)
-    if err != nil {
-        log.Fatal(err)
-    }
-    // 检查连接
-    err = mgoCli.Ping(context.TODO(), nil)
-    if err != nil {
-        log.Fatal(err)
+func initQmgo(ctx context.Context) {
+    os.Setenv("DATABASE_NAME", "kintai-db")
+    os.Setenv("STAFF_COLL_NAME", "coll-staff")
+    if mgoClient == nil {
+        mgoClient, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017"})
+        mgoDB = mgoClient.Database(os.Getenv("DATABASE_NAME"))
+        //mgoDB = mgoClient.Database("aaa")
+        mgoCollStaff = mgoDB.Collection(os.Getenv("STAFF_COLL_NAME"))
     }
 }
-func GetMgoCli() *mongo.Client {
-    if mgoCli == nil {
-        initEngine()
-    }
-    return mgoCli
+func GetStaffColl(ctx context.Context) *qmgo.Collection {
+    initQmgo(ctx)
+	return mgoCollStaff
 }

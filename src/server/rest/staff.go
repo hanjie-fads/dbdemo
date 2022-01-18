@@ -1,4 +1,4 @@
-package main
+package rest
 
 import (
 	"context"
@@ -13,36 +13,33 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func DemoQmgo() {
+func InitStaff() error {
     var (
         err error
         ctx = context.Background()
-        // client, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017"})
-        // db = client.Database("hjdb")
-        // coll = db.Collection("coll-1")
-        cli = util.GetStaffColl(ctx)
+        coll = util.GetStaffColl(ctx)
         iResult    *qmgo.InsertOneResult
         mResult    *qmgo.InsertManyResult
-        //cursor     *qmgo.Cursor
         id         primitive.ObjectID
     )
 
     // make indexes
-    cli.EnsureIndexes(ctx, []string{}, []string{"uid", "name,email"})
+    coll.EnsureIndexes(ctx, []string{}, []string{"uid", "name,email"})
 
     // 4. insert one record
-    if iResult, err = cli.InsertOne(ctx, mock.OneStaff); err != nil {
+    if iResult, err = coll.InsertOne(ctx, mock.OneStaff); err != nil {
         fmt.Print(err)
-        return
+        return err
     }
     //_id: auto unique id
     id = iResult.InsertedID.(primitive.ObjectID)
     fmt.Println("unique ID:", id.Hex())
 
     // 4. bulk insert
-    mResult, err = cli.InsertMany(context.TODO(), mock.MultiStaff)
+    mResult, err = coll.InsertMany(context.TODO(), mock.MultiStaff)
     if err != nil{
         log.Fatal(err)
+        return err
     }
     if mResult == nil {
         log.Fatal("result nil")
@@ -51,13 +48,35 @@ func DemoQmgo() {
         id = v.(primitive.ObjectID)
         fmt.Println("auto ID", id.Hex())
     }
+    return nil
+}
+
+func GetStaffAll() []model.Staff {
+    var (
+        ctx = context.Background()
+        coll = util.GetStaffColl(ctx)
+        ary = []model.Staff{}
+    )
+
+    // find all 、sort and limit
+    coll.Find(ctx, nil).All(&ary)
+
+    return ary
+}
+
+func GetStaff(uid int64) model.Staff {
+    var (
+        err error
+        ctx = context.Background()
+        coll = util.GetStaffColl(ctx)
+        one = model.Staff{}
+    )
 
 	// find one document
-    one := model.Staff{}
-    err = cli.Find(ctx, bson.M{"uid": 15}).One(&one)
+    err = coll.Find(ctx, bson.M{"uid": uid}).One(&one)
     if err != nil {
         fmt.Print(err)
-        return
+        return one
     }
-    fmt.Printf("find one: %v", one)
+    return one
 }

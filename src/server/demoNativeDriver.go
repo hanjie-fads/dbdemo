@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"kintai/mock"
 	"kintai/model"
-	"kintai/util"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,11 +12,35 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var mgoCli *mongo.Client
+
+func initEngine() {
+    var err error
+    clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+
+    // 连接到MongoDB
+    mgoCli, err = mongo.Connect(context.TODO(), clientOptions)
+    if err != nil {
+        log.Fatal(err)
+    }
+    // 检查连接
+    err = mgoCli.Ping(context.TODO(), nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+func getMgoCli() *mongo.Client {
+    if mgoCli == nil {
+        initEngine()
+    }
+    return mgoCli
+}
+
 func DemoNativeDrive() {
     var (
         // ctx = context.Background()
         // 1.init mgo
-        client = util.GetMgoCli()
+        client = getMgoCli()
         err        error
         db         *mongo.Database
         collection *mongo.Collection

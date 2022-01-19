@@ -18,7 +18,7 @@ func initQmgo(ctx context.Context) {
     os.Setenv("DATABASE_NAME", "kintai-db")
     os.Setenv("STAFF_COLL_NAME", "coll-staff")
     if mgoClient == nil {
-        mgoClient, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27018"})
+        mgoClient, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://root:example@localhost:27018"})
         mgoDB = mgoClient.Database(os.Getenv("DATABASE_NAME"))
         //mgoDB = mgoClient.Database("aaa")
         mgoCollStaff = mgoDB.Collection(os.Getenv("STAFF_COLL_NAME"))

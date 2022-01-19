@@ -16,11 +16,11 @@ import (
 func InitStaff() error {
     var (
         err error
-        ctx = context.Background()
-        coll = util.GetStaffColl(ctx)
-        iResult    *qmgo.InsertOneResult
-        mResult    *qmgo.InsertManyResult
-        id         primitive.ObjectID
+        ctx     = context.Background()
+        coll    = util.GetStaffColl(ctx)
+        iResult *qmgo.InsertOneResult
+        mResult *qmgo.InsertManyResult
+        id      primitive.ObjectID
     )
 
     // make indexes
@@ -48,6 +48,47 @@ func InitStaff() error {
         id = v.(primitive.ObjectID)
         fmt.Println("auto ID", id.Hex())
     }
+    return nil
+}
+
+func CreateStaff(staff model.Staff) error {
+    var (
+        err error
+        ctx     = context.Background()
+        coll    = util.GetStaffColl(ctx)
+        iResult *qmgo.InsertOneResult
+        id      primitive.ObjectID
+    )
+
+    // insert one record
+    if iResult, err = coll.InsertOne(ctx, mock.OneStaff); err != nil {
+        fmt.Print(err)
+        return err
+    }
+    //_id: auto unique id
+    id = iResult.InsertedID.(primitive.ObjectID)
+    err = coll.Find(ctx, bson.M{"_id": id}).One(&staff)
+    if err != nil {
+        fmt.Print(err)
+        return err
+    }
+
+    return nil
+}
+
+func UpdateStaff(staff model.Staff) error {
+    var (
+        err error
+        ctx     = context.Background()
+        coll    = util.GetStaffColl(ctx)
+    )
+
+    // insert one record
+    if err = coll.UpdateOne(ctx, bson.M{"uid": staff.Uid}, bson.M{"$set": staff}); err != nil {
+        fmt.Print(err)
+        return err
+    }
+
     return nil
 }
 
@@ -79,4 +120,19 @@ func GetStaff(uid int64) model.Staff {
         return one
     }
     return one
+}
+func DelStaff(uid int64) error {
+    var (
+        err error
+        ctx = context.Background()
+        coll = util.GetStaffColl(ctx)
+    )
+
+	// find one document
+    err = coll.Remove(ctx, bson.M{"uid": uid})
+    if err != nil {
+        fmt.Print(err)
+        return err
+    }
+    return nil
 }

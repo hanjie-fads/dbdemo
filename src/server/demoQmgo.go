@@ -20,7 +20,7 @@ func DemoQmgo() {
         // client, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017"})
         // db = client.Database("hjdb")
         // coll = db.Collection("coll-1")
-        cli = util.GetStaffColl(ctx)
+        coll = util.GetStaffColl(ctx)
         iResult    *qmgo.InsertOneResult
         mResult    *qmgo.InsertManyResult
         //cursor     *qmgo.Cursor
@@ -28,10 +28,10 @@ func DemoQmgo() {
     )
 
     // make indexes
-    cli.EnsureIndexes(ctx, []string{}, []string{"uid", "name,email"})
+    coll.EnsureIndexes(ctx, []string{}, []string{"uid", "name,email"})
 
     // 4. insert one record
-    if iResult, err = cli.InsertOne(ctx, mock.OneStaff); err != nil {
+    if iResult, err = coll.InsertOne(ctx, mock.OneStaff); err != nil {
         fmt.Print(err)
         return
     }
@@ -40,7 +40,7 @@ func DemoQmgo() {
     fmt.Println("unique ID:", id.Hex())
 
     // 4. bulk insert
-    mResult, err = cli.InsertMany(context.TODO(), mock.MultiStaff)
+    mResult, err = coll.InsertMany(context.TODO(), mock.MultiStaff)
     if err != nil{
         log.Fatal(err)
     }
@@ -54,7 +54,7 @@ func DemoQmgo() {
 
 	// find one document
     one := model.Staff{}
-    err = cli.Find(ctx, bson.M{"uid": 15}).One(&one)
+    err = coll.Find(ctx, bson.M{"uid": 15}).One(&one)
     if err != nil {
         fmt.Print(err)
         return

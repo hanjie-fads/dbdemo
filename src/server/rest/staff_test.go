@@ -28,3 +28,20 @@ func Test_GetStaffAll(t *testing.T) {
 		t.Log("rest.GetStaffAll() is ok")
 	}
 }
+func Test_GetStaff(t *testing.T) {
+	tr := true
+	if GetStaff(15) != mock.OneStaff {
+		tr = false
+	}
+	if GetStaff(4) != mock.MultiStaff[0] {
+		tr = false
+	}
+	if GetStaff(14) != mock.MultiStaff[1] {
+		tr = false
+	}
+	if !tr {
+		t.Errorf("rest.GetStaff() failed;")
+	} else {
+		t.Log("rest.GetStaff() is ok")
+	}
+}

@@ -51,15 +51,18 @@ func deleteStaff(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, nil)
 	}
 }
+func setupStaffAPI(r *gin.Engine) {
+	r.GET("/staff/init", initStaff)
+	r.GET("/staff", getStaffAll)
+	r.GET("/staff/:uid", getStaff)
+	r.POST("/staff", createStaff)
+	r.PUT("/staff/:uid", updateStaff)
+	r.DELETE("/staff/:uid", deleteStaff)
+}
 func main() {
-	DemoQmgo()
 	router := gin.Default()
-	router.GET("/staff/init", getStaffAll)
-	router.GET("/staff", getStaffAll)
-	router.GET("/staff/:uid", getStaff)
-	router.POST("/staff", createStaff)
-	router.PUT("/staff/:uid", updateStaff)
-	router.DELETE("/staff/:uid", deleteStaff)
+	router.GET("/", getStaffAll)
+	setupStaffAPI(router)
 	err := router.Run(":8075")
 	if err != nil {
 		log.Fatalf("Danger! error at router.Run() %v", err)

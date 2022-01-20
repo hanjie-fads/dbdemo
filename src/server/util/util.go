@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/qiniu/qmgo"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -20,8 +21,11 @@ func initQmgo(ctx context.Context) {
     if mgoClient == nil {
         mgoClient, err = qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://root:example@localhost:27018"})
         mgoDB = mgoClient.Database(os.Getenv("DATABASE_NAME"))
-        //mgoDB = mgoClient.Database("aaa")
-        mgoCollStaff = mgoDB.Collection(os.Getenv("STAFF_COLL_NAME"))
+        dbName := os.Getenv("DATABASE_NAME")
+        collName := os.Getenv("STAFF_COLL_NAME")
+        mgoDB = mgoClient.Database(dbName)
+        mgoCollStaff = mgoDB.Collection(collName)
+        logrus.Printf("connect mongo at %v/%v", dbName, collName)
     }
 }
 func GetStaffColl(ctx context.Context) *qmgo.Collection {
